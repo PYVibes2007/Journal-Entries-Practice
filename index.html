@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting Journal Practice - Master Journal Entries</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10403B;
+            --primary-light: #127369;
+            --secondary: #d4af37;
+            --background: #f8f6f1;
+            --card-bg: #ffffff;
+            --text: #2c2416;
+            --text-muted: #6b6456;
+            --border: #d4cfc3;
+            --success: #2d7a3e;
+            --error: #b73939;
+            --shadow: rgba(44, 36, 22, 0.08);
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background: linear-gradient(135deg, #f8f6f1 0%, #ece8dd 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Chart of Accounts Sidebar */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .account-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .category-title {
+            font-weight: 600;
+            font-size: 12pt;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.3rem;
+        }
+
+        .account-list {
+            list-style: none;
+            padding-left: 0.5rem;
+        }
+
+        .account-list li {
+            padding: 0.2rem 0;
+            font-size: 12pt;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+
+        .header h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 2.25rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.03em;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .transaction-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border-left: 4px solid var(--secondary);
+            position: relative;
+        }
+
+        .transaction-card h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hint-button {
+            background: var(--secondary);
+            color: var(--text);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .hint-button:hover {
+            background: #c49b2e;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
+        }
+
+        .transaction-card p {
+            font-size: 12pt;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* Accounting Equation Bar */
+        .equation-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(16, 64, 59, 0.3);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .equation-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 100%;
+        }
+
+        .equation-title {
+            display: none;
+        }
+
+        .equation-main {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .equation-part {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .equation-value {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            min-width: 90px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .equation-operator {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .equation-detail {
+            font-size: 0.7rem;
+            opacity: 0.85;
+            font-style: italic;
+            text-align: center;
+            margin-top: 0.3rem;
+            width: 100%;
+        }
+
+        .equation-balanced {
+            animation: glow 0.5s ease;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); }
+        }
+
+        /* Hint Modal */
+        .hint-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .hint-modal.show {
+            display: flex;
+        }
+
+        .hint-modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .hint-modal-content h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hint-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .hint-section h4 {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .hint-section p {
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .hint-rule {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.3rem 0;
+            font-size: 0.95rem;
+        }
+
+        .hint-rule-badge {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .hint-mnemonic {
+            background: var(--secondary);
+            color: var(--text);
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+
+        .hint-close-btn {
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+
+        /* Journal Entry Section */
+        .journal-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            flex: 0 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Merriweather', serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .journal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.5rem;
+        }
+
+        .journal-table thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .journal-table th {
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+        }
+
+        .journal-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .journal-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        .journal-table tbody tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .journal-table td {
+            padding: 0.5rem 0.75rem;
+        }
+
+        .journal-input {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .journal-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 117, 102, 0.1);
+        }
+
+        .journal-input.error {
+            border-color: var(--error);
+        }
+
+        .journal-input.success {
+            border-color: var(--success);
+        }
+
+        /* T-Accounts Section */
+        .t-accounts-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            flex: 0 0 auto;
+        }
+
+        .t-accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .t-account {
+            border: 3px solid var(--primary);
+            border-radius: 8px;
+            overflow: visible;
+            background: white;
+            min-width: 0;
+        }
+
+        .t-account-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .t-account-header input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .t-account-header input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .t-account-header input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .t-account-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100px;
+        }
+
+        .t-account-side {
+            padding: 0.6rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .t-account-side:first-child {
+            border-right: 3px solid var(--primary);
+        }
+
+        .t-account-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+        }
+
+        .t-account-input {
+            width: 100%;
+            padding: 0.35rem 0.3rem;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .t-account-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 64, 59, 0.1);
+        }
+
+        .t-account-input.error {
+            border-color: var(--error);
+        }
+
+        .t-account-input.success {
+            border-color: var(--success);
+        }
+
+        .t-account-footer {
+            background: var(--background);
+            padding: 0.5rem;
+            border-top: 3px solid var(--primary);
+        }
+
+        .t-account-footer label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .normal-balance-select {
+            width: 100%;
+            padding: 0.35rem 0.3rem;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .normal-balance-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 64, 59, 0.1);
+        }
+
+        .normal-balance-select.error {
+            border-color: var(--error);
+        }
+
+        .normal-balance-select.success {
+            border-color: var(--success);
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            padding: 1rem 0 0.5rem 0;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 0.65rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Source Sans Pro', sans-serif;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 64, 59, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0a2a26 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 64, 59, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Celebration Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes scaleIn {
+            from { 
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .graffiti-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            background-image: 
+                radial-gradient(circle at 20% 30%, #ff6b6b 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, #4ecdc4 0%, transparent 40%),
+                radial-gradient(circle at 40% 70%, #ffe66d 0%, transparent 40%),
+                radial-gradient(circle at 70% 80%, #a8e6cf 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #ff8b94 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .modal-content h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #ffe66d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .modal-content p {
+            font-size: 1.4rem;
+            color: var(--success);
+            margin-bottom: 2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-content .btn {
+            position: relative;
+            z-index: 1;
+            margin: 0 auto;
+        }
+
+        .celebration-emoji {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: bounce 0.6s ease infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
+
+        .graffiti-text {
+            position: absolute;
+            font-family: 'Merriweather', serif;
+            font-weight: 900;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .graffiti-1 {
+            top: 10%;
+            left: 5%;
+            font-size: 2rem;
+            color: #ff6b6b;
+            transform: rotate(-15deg);
+            animation-delay: 0s;
+        }
+
+        .graffiti-2 {
+            top: 15%;
+            right: 8%;
+            font-size: 1.5rem;
+            color: #4ecdc4;
+            transform: rotate(12deg);
+            animation-delay: 0.5s;
+        }
+
+        .graffiti-3 {
+            bottom: 20%;
+            left: 10%;
+            font-size: 1.8rem;
+            color: #ffe66d;
+            transform: rotate(-8deg);
+            animation-delay: 1s;
+        }
+
+        .graffiti-4 {
+            bottom: 15%;
+            right: 5%;
+            font-size: 1.6rem;
+            color: #a8e6cf;
+            transform: rotate(18deg);
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(var(--rotate, 0deg)); }
+            50% { transform: translateY(-10px) rotate(var(--rotate, 0deg)); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            /* Tablet adjustments */
+            .container {
+                grid-template-columns: 250px 1fr;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+
+            .sidebar {
+                padding: 1rem 0.75rem;
+            }
+
+            .sidebar h2 {
+                font-size: 1.1rem;
+            }
+
+            .account-list li {
+                font-size: 11pt;
+            }
+
+            .category-title {
+                font-size: 11pt;
+            }
+        }
+
+        @media (max-width: 968px) {
+            /* Mobile landscape and smaller tablets */
+            body {
+                overflow: auto;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
+                overflow: visible;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+                height: auto;
+                overflow: visible;
+                margin-bottom: 1rem;
+            }
+
+            .main-content {
+                height: auto;
+                overflow: visible;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .t-accounts-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .equation-main {
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+
+            .equation-value {
+                min-width: 80px;
+                font-size: 0.9rem;
+            }
+
+            .equation-bar {
+                padding: 0.5rem 1rem;
+            }
+
+            .equation-detail {
+                font-size: 0.65rem;
+            }
+
+            .transaction-card {
+                padding: 1rem;
+            }
+
+            .transaction-card p {
+                font-size: 11pt;
+            }
+
+            .journal-table th,
+            .journal-table td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .journal-input {
+                font-size: 0.85rem;
+                padding: 0.4rem;
+            }
+
+            .btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+                margin-top: 1rem;
+            }
+
+            .actions .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Mobile portrait */
+            .container {
+                padding: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .sidebar h2 {
+                font-size: 1rem;
+            }
+
+            .account-list li {
+                font-size: 10pt;
+                padding: 0.15rem 0;
+            }
+
+            .category-title {
+                font-size: 10pt;
+            }
+
+            .equation-main {
+                font-size: 0.9rem;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .equation-operator {
+                transform: rotate(90deg);
+                margin: 0.25rem 0;
+            }
+
+            .journal-table {
+                font-size: 0.75rem;
+            }
+
+            .journal-table th,
+            .journal-table td {
+                padding: 0.4rem 0.3rem;
+            }
+
+            .t-account-header input {
+                font-size: 0.75rem;
+            }
+
+            .t-account-input,
+            .normal-balance-select {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.25rem;
+            }
+
+            .t-account-label {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Touch-friendly adjustments */
+        @media (hover: none) and (pointer: coarse) {
+            .journal-input,
+            .t-account-input,
+            .normal-balance-select {
+                min-height: 44px; /* Apple's recommended minimum touch target */
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .btn {
+                min-height: 44px;
+                padding: 0.75rem 1.5rem;
+            }
+
+            .hint-button {
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+
+        /* Icon styles */
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Chart of Accounts Sidebar -->
+        <aside class="sidebar">
+            <h2>Chart of Accounts</h2>
+            <div id="chartOfAccounts"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1>Journal Entry Practice</h1>
+                <p>Practice journalizing one transaction at a time. Post the transaction to the appropriate T-accounts then determine the normal balance. Click on Check Answers to review the results. Select New Transaction to begin another practice round.</p>
+            </header>
+
+            <!-- Accounting Equation Bar -->
+            <div class="equation-bar">
+                <div class="equation-content">
+                    <div class="equation-title">Accounting Equation</div>
+                    <div class="equation-main">
+                        <div class="equation-part">
+                            <span>Assets</span>
+                            <span class="equation-value" id="assets-value">$0.00</span>
+                        </div>
+                        <span class="equation-operator">=</span>
+                        <div class="equation-part">
+                            <span>Liabilities</span>
+                            <span class="equation-value" id="liabilities-value">$0.00</span>
+                        </div>
+                        <span class="equation-operator">+</span>
+                        <div class="equation-part">
+                            <span>Owner's Equity</span>
+                            <span class="equation-value" id="equity-value">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="equation-detail" id="equation-detail"></div>
+                </div>
+            </div>
+
+            <!-- Transaction Card -->
+            <div class="transaction-card" id="transactionCard">
+                <h2>
+                    Transaction:
+                    <button class="hint-button" onclick="showHint()" title="Need help?">?</button>
+                </h2>
+                <p id="transactionText">Loading...</p>
+            </div>
+
+            <!-- Journal Entry Section -->
+            <section class="journal-section">
+                <h3 class="section-title">Journal Entry</h3>
+                <table class="journal-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Account</th>
+                            <th style="width: 25%;">Debit</th>
+                            <th style="width: 25%;">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="journalEntryBody">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- T-Accounts Section -->
+            <section class="t-accounts-section">
+                <h3 class="section-title">T-Accounts</h3>
+                <div class="t-accounts-grid" id="tAccountsGrid">
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="actions">
+                <button class="btn btn-primary" onclick="checkAnswers()">
+                    <span class="icon">✓</span>
+                    Check Answers
+                </button>
+                <button class="btn btn-secondary" onclick="newTransaction()">
+                    <span class="icon">↻</span>
+                    New Transaction
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div class="modal" id="celebrationModal">
+        <div class="modal-content">
+            <div class="graffiti-bg"></div>
+            <div class="graffiti-text graffiti-1" style="--rotate: -15deg;">★</div>
+            <div class="graffiti-text graffiti-2" style="--rotate: 12deg;">✓</div>
+            <div class="graffiti-text graffiti-3" style="--rotate: -8deg;">★</div>
+            <div class="graffiti-text graffiti-4" style="--rotate: 18deg;">✓</div>
+            <div class="celebration-emoji">🎉</div>
+            <h2>Great Job!</h2>
+            <p>100% Correct!</p>
+            <button class="btn btn-primary" onclick="closeCelebration()">Continue</button>
+        </div>
+    </div>
+
+    <!-- Hint Modal -->
+    <div class="hint-modal" id="hintModal">
+        <div class="hint-modal-content">
+            <h3>💡 Debit & Credit Rules</h3>
+            
+            <div class="hint-mnemonic">
+                <strong>DEAD</strong> – Debit Equity Assets and Drawing<br>
+                <strong>CLIC</strong> – Credit Liabilities Income and Capital
+            </div>
+
+            <div class="hint-section">
+                <h4>Assets</h4>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">DEBIT</span>
+                    <span>Increases: Cash received, equipment purchased, etc.</span>
+                </div>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">CREDIT</span>
+                    <span>Decreases: Cash paid, supplies used, etc.</span>
+                </div>
+                <p><em>Examples: Cash, Accounts Receivable, Equipment, Supplies</em></p>
+            </div>
+
+            <div class="hint-section">
+                <h4>Liabilities</h4>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">DEBIT</span>
+                    <span>Decreases: Paying off debts</span>
+                </div>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">CREDIT</span>
+                    <span>Increases: Borrowing money, buying on account</span>
+                </div>
+                <p><em>Examples: Accounts Payable, Notes Payable, Unearned Revenue</em></p>
+            </div>
+
+            <div class="hint-section">
+                <h4>Equity</h4>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">DEBIT</span>
+                    <span>Decreases: Owner withdrawals</span>
+                </div>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">CREDIT</span>
+                    <span>Increases: Owner investments</span>
+                </div>
+                <p><em>Examples: Izzy Summerbell, Capital (credit); Izzy Summerbell, Withdrawal (debit)</em></p>
+            </div>
+
+            <div class="hint-section">
+                <h4>Revenue</h4>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">DEBIT</span>
+                    <span>Decreases: Refunds or corrections</span>
+                </div>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">CREDIT</span>
+                    <span>Increases: Earning revenue, receiving payments</span>
+                </div>
+                <p><em>Examples: Fees Earned, Rent Revenue, Service Revenue</em></p>
+            </div>
+
+            <div class="hint-section">
+                <h4>Expenses</h4>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">DEBIT</span>
+                    <span>Increases: Recording expenses incurred</span>
+                </div>
+                <div class="hint-rule">
+                    <span class="hint-rule-badge">CREDIT</span>
+                    <span>Decreases: Correcting overstated expenses</span>
+                </div>
+                <p><em>Examples: Rent Expense, Salaries Expense, Utilities Expense</em></p>
+            </div>
+
+            <button class="btn btn-primary hint-close-btn" onclick="closeHint()">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        // Accounting Data
+        const CHART_OF_ACCOUNTS = {
+            Assets: ['Cash', 'Accounts Receivable', 'Prepaid Insurance', 'Office Supplies', 'Office Equipment', 'Land'],
+            Liabilities: ['Accounts Payable', 'Unearned Rent', 'Unearned Fees Income', 'Notes Payable'],
+            Equity: ['Izzy Summerbell, Capital', 'Izzy Summerbell, Withdrawal'],
+            Revenue: ['Fees Earned', 'Rent Revenue'],
+            Expenses: ['Salaries Expense', 'Rent Expense', 'Advertising Expense', 'Automobile Expense', 'Utilities Expense', 'Supplies Expense', 'Miscellaneous Expense']
+        };
+
+        const NORMAL_BALANCES = {
+            'Cash': 'Debit', 'Accounts Receivable': 'Debit', 'Prepaid Insurance': 'Debit',
+            'Office Supplies': 'Debit', 'Office Equipment': 'Debit', 'Land': 'Debit',
+            'Accounts Payable': 'Credit', 'Unearned Rent': 'Credit', 'Unearned Fees Income': 'Credit',
+            'Notes Payable': 'Credit', 'Izzy Summerbell, Capital': 'Credit', 'Izzy Summerbell, Withdrawal': 'Debit',
+            'Fees Earned': 'Credit', 'Rent Revenue': 'Credit', 'Salaries Expense': 'Debit',
+            'Rent Expense': 'Debit', 'Advertising Expense': 'Debit', 'Automobile Expense': 'Debit',
+            'Utilities Expense': 'Debit', 'Supplies Expense': 'Debit', 'Miscellaneous Expense': 'Debit'
+        };
+
+        const PRACTICE_TRANSACTIONS = [
+            { id: '1', description: 'Purchased office supplies on account, $1,210.', entries: [{ account: 'Office Supplies', debit: 1210 }, { account: 'Accounts Payable', credit: 1210 }] },
+            { id: '2', description: 'Paid rent on office for month, $4,650.', entries: [{ account: 'Rent Expense', debit: 4650 }, { account: 'Cash', credit: 4650 }] },
+            { id: '3', description: 'Received cash from clients on account, $23,260.', entries: [{ account: 'Cash', debit: 23260 }, { account: 'Accounts Receivable', credit: 23260 }] },
+            { id: '4', description: 'Paid annual insurance premiums, $3,350.', entries: [{ account: 'Prepaid Insurance', debit: 3350 }, { account: 'Cash', credit: 3350 }] },
+            { id: '5', description: 'Returned a portion of the office supplies (bill has not been paid as of yet), receiving full credit for their cost, $190.', entries: [{ account: 'Accounts Payable', debit: 190 }, { account: 'Office Supplies', credit: 190 }] },
+            { id: '6', description: 'Paid advertising expense, $1,860.', entries: [{ account: 'Advertising Expense', debit: 1860 }, { account: 'Cash', credit: 1860 }] },
+            { id: '7', description: 'Paid creditors on account, $4,190.', entries: [{ account: 'Accounts Payable', debit: 4190 }, { account: 'Cash', credit: 4190 }] },
+            { id: '8', description: 'Paid miscellaneous expenses, $420.', entries: [{ account: 'Miscellaneous Expense', debit: 420 }, { account: 'Cash', credit: 420 }] },
+            { id: '9', description: 'Paid automobile expense, $1,400.', entries: [{ account: 'Automobile Expense', debit: 1400 }, { account: 'Cash', credit: 1400 }] },
+            { id: '10', description: 'Discovered an error in calculating salaries; received cash from the employee for the overpayment, $930.', entries: [{ account: 'Cash', debit: 930 }, { account: 'Salaries Expense', credit: 930 }] },
+            { id: '11', description: 'Paid salaries for the month, $6,560.', entries: [{ account: 'Salaries Expense', debit: 6560 }, { account: 'Cash', credit: 6560 }] },
+            { id: '12', description: 'Recorded revenue earned and billed to clients during the month, $27,910.', entries: [{ account: 'Accounts Receivable', debit: 27910 }, { account: 'Fees Earned', credit: 27910 }] },
+            { id: '13', description: 'Purchased land for a future building site for $83,700, paying $9,200 in cash and giving a note payable for the remainder.', entries: [{ account: 'Land', debit: 83700 }, { account: 'Cash', credit: 9200 }, { account: 'Notes Payable', credit: 74500 }] },
+            { id: '14', description: 'Paid cash to owner for personal use, $930.', entries: [{ account: 'Izzy Summerbell, Withdrawal', debit: 930 }, { account: 'Cash', credit: 930 }] },
+            { id: '15', description: 'Rented a parcel of land to a local university for use as a parking lot during football season; received advance payment of $2,790.', entries: [{ account: 'Cash', debit: 2790 }, { account: 'Unearned Rent', credit: 2790 }] },
+            { id: '16', description: 'Received advance payment for services to be performed later, $6,200.', entries: [{ account: 'Cash', debit: 6200 }, { account: 'Unearned Fees Income', credit: 6200 }] },
+            { id: '17', description: 'Owner invested $10,900 into the business.', entries: [{ account: 'Cash', debit: 10900 }, { account: 'Izzy Summerbell, Capital', credit: 10900 }] },
+            { id: '18', description: 'Owner invested office equipment into the business, $15,000.', entries: [{ account: 'Office Equipment', debit: 15000 }, { account: 'Izzy Summerbell, Capital', credit: 15000 }] },
+            { id: '19', description: 'Purchased supplies with cash, $650.', entries: [{ account: 'Office Supplies', debit: 650 }, { account: 'Cash', credit: 650 }] },
+            { id: '20', description: 'Purchase office equipment on account, $12,000.', entries: [{ account: 'Office Equipment', debit: 12000 }, { account: 'Accounts Payable', credit: 12000 }] },
+            { id: '21', description: 'Received utility bill to be paid in the next accounting period, $365.', entries: [{ account: 'Utilities Expense', debit: 365 }, { account: 'Accounts Payable', credit: 365 }] },
+            { id: '22', description: 'Owner withdrew cash, $1,500.', entries: [{ account: 'Izzy Summerbell, Withdrawal', debit: 1500 }, { account: 'Cash', credit: 1500 }] },
+            { id: '23', description: 'As of month end, the Supplies account reflects a balance of $5,000. It was determined that the supplies on hand was $1,200, record the expense.', entries: [{ account: 'Supplies Expense', debit: 3800 }, { account: 'Office Supplies', credit: 3800 }] }
+        ];
+
+        let currentTransaction = null;
+        let completedTransactions = new Set();
+        let availableTransactions = [...PRACTICE_TRANSACTIONS];
+
+        // Initialize
+        function init() {
+            renderChartOfAccounts();
+            newTransaction();
+        }
+
+        // Render Chart of Accounts
+        function renderChartOfAccounts() {
+            const container = document.getElementById('chartOfAccounts');
+            container.innerHTML = '';
+            
+            for (const [category, accounts] of Object.entries(CHART_OF_ACCOUNTS)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'account-category';
+                
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.textContent = category;
+                
+                const list = document.createElement('ul');
+                list.className = 'account-list';
+                
+                accounts.forEach(account => {
+                    const li = document.createElement('li');
+                    li.textContent = account;
+                    list.appendChild(li);
+                });
+                
+                categoryDiv.appendChild(title);
+                categoryDiv.appendChild(list);
+                container.appendChild(categoryDiv);
+            }
+        }
+
+        // Load New Transaction
+        function newTransaction() {
+            if (availableTransactions.length === 0) {
+                availableTransactions = PRACTICE_TRANSACTIONS.filter(t => !completedTransactions.has(t.id));
+                if (availableTransactions.length === 0) {
+                    completedTransactions.clear();
+                    availableTransactions = [...PRACTICE_TRANSACTIONS];
+                }
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableTransactions.length);
+            currentTransaction = availableTransactions.splice(randomIndex, 1)[0];
+            
+            document.getElementById('transactionText').textContent = currentTransaction.description;
+            
+            renderJournalEntry();
+            renderTAccounts();
+        }
+
+        // Render Journal Entry Form
+        function renderJournalEntry() {
+            const tbody = document.getElementById('journalEntryBody');
+            tbody.innerHTML = '';
+            
+            const numRows = currentTransaction.entries.length;
+            for (let i = 0; i < numRows; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" class="journal-input" id="journal-account-${i}" placeholder="Enter account name" autocomplete="off"></td>
+                    <td><input type="text" class="journal-input" id="journal-debit-${i}" placeholder="" autocomplete="off"></td>
+                    <td><input type="text" class="journal-input" id="journal-credit-${i}" placeholder="" autocomplete="off"></td>
+                `;
+                tbody.appendChild(row);
+                
+                // Add event listener for account name to auto-populate T-accounts
+                const accountInput = document.getElementById(`journal-account-${i}`);
+                accountInput.addEventListener('input', function(e) {
+                    if (i < 3) {
+                        const tAccountNameInput = document.getElementById(`t-account-name-${i}`);
+                        if (tAccountNameInput) {
+                            tAccountNameInput.value = e.target.value;
+                        }
+                    }
+                });
+                accountInput.addEventListener('blur', updateAccountingEquation);
+                
+                // Add number formatting to debit input
+                const debitInput = document.getElementById(`journal-debit-${i}`);
+                debitInput.addEventListener('blur', function(e) {
+                    formatNumberInput(e.target);
+                    updateAccountingEquation();
+                });
+                debitInput.addEventListener('focus', function(e) {
+                    removeFormatting(e.target);
+                });
+                
+                // Add number formatting to credit input
+                const creditInput = document.getElementById(`journal-credit-${i}`);
+                creditInput.addEventListener('blur', function(e) {
+                    formatNumberInput(e.target);
+                    updateAccountingEquation();
+                });
+                creditInput.addEventListener('focus', function(e) {
+                    removeFormatting(e.target);
+                });
+            }
+
+            // Reset equation when new transaction loads
+            updateAccountingEquation();
+        }
+
+        // Format number with commas
+        function formatNumberInput(input) {
+            let value = input.value.replace(/,/g, '');
+            if (value && !isNaN(value)) {
+                const number = parseFloat(value);
+                input.value = number.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+        }
+
+        // Remove formatting when focused for easier editing
+        function removeFormatting(input) {
+            let value = input.value.replace(/,/g, '');
+            if (value && !isNaN(value)) {
+                input.value = value;
+            }
+        }
+
+        // Render T-Accounts
+        function renderTAccounts() {
+            const grid = document.getElementById('tAccountsGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 3; i++) {
+                const tAccount = document.createElement('div');
+                tAccount.className = 't-account';
+                tAccount.innerHTML = `
+                    <div class="t-account-header">
+                        <input type="text" id="t-account-name-${i}" placeholder="Account Name" readonly style="cursor: default;" autocomplete="off">
+                    </div>
+                    <div class="t-account-body">
+                        <div class="t-account-side">
+                            <label class="t-account-label">Debit</label>
+                            <input type="text" class="t-account-input" id="t-debit-${i}" placeholder="" autocomplete="off">
+                        </div>
+                        <div class="t-account-side">
+                            <label class="t-account-label">Credit</label>
+                            <input type="text" class="t-account-input" id="t-credit-${i}" placeholder="" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="t-account-footer">
+                        <label>Normal Balance</label>
+                        <select class="normal-balance-select" id="t-balance-${i}" autocomplete="off">
+                            <option value="">Select...</option>
+                            <option value="Debit">Debit</option>
+                            <option value="Credit">Credit</option>
+                        </select>
+                    </div>
+                `;
+                grid.appendChild(tAccount);
+                
+                // Add number formatting to T-account debit input
+                const tDebitInput = document.getElementById(`t-debit-${i}`);
+                tDebitInput.addEventListener('blur', function(e) {
+                    formatNumberInput(e.target);
+                });
+                tDebitInput.addEventListener('focus', function(e) {
+                    removeFormatting(e.target);
+                });
+                
+                // Add number formatting to T-account credit input
+                const tCreditInput = document.getElementById(`t-credit-${i}`);
+                tCreditInput.addEventListener('blur', function(e) {
+                    formatNumberInput(e.target);
+                });
+                tCreditInput.addEventListener('focus', function(e) {
+                    removeFormatting(e.target);
+                });
+            }
+        }
+
+        // Normalize text for comparison
+        function normalize(text) {
+            return text.trim().toLowerCase().replace(/[,\s]/g, '');
+        }
+
+        // Check Answers
+        function checkAnswers() {
+            if (!currentTransaction) return;
+            
+            let allCorrect = true;
+            
+            // Clear previous styling
+            document.querySelectorAll('.journal-input, .t-account-input, .normal-balance-select').forEach(input => {
+                input.classList.remove('error', 'success');
+            });
+            
+            // Validate Journal Entries
+            const journalEntries = [];
+            for (let i = 0; i < currentTransaction.entries.length; i++) {
+                const account = document.getElementById(`journal-account-${i}`).value;
+                const debit = document.getElementById(`journal-debit-${i}`).value;
+                const credit = document.getElementById(`journal-credit-${i}`).value;
+                
+                journalEntries.push({ account, debit, credit });
+                
+                const expected = currentTransaction.entries[i];
+                
+                // Check account name
+                const accountInput = document.getElementById(`journal-account-${i}`);
+                if (normalize(account) === normalize(expected.account)) {
+                    accountInput.classList.add('success');
+                } else {
+                    accountInput.classList.add('error');
+                    allCorrect = false;
+                }
+                
+                // Check debit
+                const debitInput = document.getElementById(`journal-debit-${i}`);
+                const debitValue = parseFloat(debit.replace(/,/g, '')) || 0;
+                if (expected.debit && Math.abs(debitValue - expected.debit) < 0.01) {
+                    debitInput.classList.add('success');
+                } else if (!expected.debit && !debit) {
+                    debitInput.classList.add('success');
+                } else {
+                    debitInput.classList.add('error');
+                    allCorrect = false;
+                }
+                
+                // Check credit
+                const creditInput = document.getElementById(`journal-credit-${i}`);
+                const creditValue = parseFloat(credit.replace(/,/g, '')) || 0;
+                if (expected.credit && Math.abs(creditValue - expected.credit) < 0.01) {
+                    creditInput.classList.add('success');
+                } else if (!expected.credit && !credit) {
+                    creditInput.classList.add('success');
+                } else {
+                    creditInput.classList.add('error');
+                    allCorrect = false;
+                }
+            }
+            
+            // Validate T-Accounts
+            for (let i = 0; i < Math.min(3, journalEntries.length); i++) {
+                const tAccountName = document.getElementById(`t-account-name-${i}`).value;
+                const tDebit = document.getElementById(`t-debit-${i}`).value;
+                const tCredit = document.getElementById(`t-credit-${i}`).value;
+                const tBalance = document.getElementById(`t-balance-${i}`).value;
+                
+                if (!tAccountName) continue;
+                
+                const journalEntry = journalEntries.find(e => 
+                    normalize(e.account) === normalize(tAccountName)
+                );
+                
+                if (journalEntry) {
+                    const journalDebit = parseFloat(journalEntry.debit.replace(/,/g, '')) || 0;
+                    const journalCredit = parseFloat(journalEntry.credit.replace(/,/g, '')) || 0;
+                    const tDebitValue = parseFloat(tDebit.replace(/,/g, '')) || 0;
+                    const tCreditValue = parseFloat(tCredit.replace(/,/g, '')) || 0;
+                    
+                    // Check debit
+                    const debitInput = document.getElementById(`t-debit-${i}`);
+                    if (Math.abs(tDebitValue - journalDebit) < 0.01) {
+                        debitInput.classList.add('success');
+                    } else {
+                        debitInput.classList.add('error');
+                        allCorrect = false;
+                    }
+                    
+                    // Check credit
+                    const creditInput = document.getElementById(`t-credit-${i}`);
+                    if (Math.abs(tCreditValue - journalCredit) < 0.01) {
+                        creditInput.classList.add('success');
+                    } else {
+                        creditInput.classList.add('error');
+                        allCorrect = false;
+                    }
+                    
+                    // Check normal balance - need to find the correct expected balance
+                    const balanceSelect = document.getElementById(`t-balance-${i}`);
+                    let expectedBalance = null;
+                    
+                    // Try to find the normal balance by matching the account name
+                    for (const [accountName, balance] of Object.entries(NORMAL_BALANCES)) {
+                        if (normalize(accountName) === normalize(tAccountName)) {
+                            expectedBalance = balance;
+                            break;
+                        }
+                    }
+                    
+                    if (expectedBalance && tBalance === expectedBalance) {
+                        balanceSelect.classList.add('success');
+                    } else if (expectedBalance) {
+                        balanceSelect.classList.add('error');
+                        allCorrect = false;
+                    }
+                }
+            }
+            
+            if (allCorrect) {
+                completedTransactions.add(currentTransaction.id);
+                showCelebration();
+            }
+        }
+
+        // Show Celebration Modal
+        function showCelebration() {
+            document.getElementById('celebrationModal').classList.add('show');
+        }
+
+        // Close Celebration Modal
+        function closeCelebration() {
+            document.getElementById('celebrationModal').classList.remove('show');
+        }
+
+        // Initialize on load
+        window.onload = init;
+
+        // Show Hint Modal
+        function showHint() {
+            document.getElementById('hintModal').classList.add('show');
+        }
+
+        // Close Hint Modal
+        function closeHint() {
+            document.getElementById('hintModal').classList.remove('show');
+        }
+
+        // Close hint modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const hintModal = document.getElementById('hintModal');
+            if (event.target === hintModal) {
+                closeHint();
+            }
+        });
+
+        // Account type categories for equation calculation
+        const ACCOUNT_CATEGORIES = {
+            'Cash': 'Assets',
+            'Accounts Receivable': 'Assets',
+            'Prepaid Insurance': 'Assets',
+            'Office Supplies': 'Assets',
+            'Office Equipment': 'Assets',
+            'Land': 'Assets',
+            'Accounts Payable': 'Liabilities',
+            'Unearned Rent': 'Liabilities',
+            'Unearned Fees Income': 'Liabilities',
+            'Notes Payable': 'Liabilities',
+            'Izzy Summerbell, Capital': 'Equity',
+            'Izzy Summerbell, Withdrawal': 'Equity',
+            'Fees Earned': 'Equity',
+            'Rent Revenue': 'Equity',
+            'Salaries Expense': 'Equity',
+            'Rent Expense': 'Equity',
+            'Advertising Expense': 'Equity',
+            'Automobile Expense': 'Equity',
+            'Utilities Expense': 'Equity',
+            'Supplies Expense': 'Equity',
+            'Miscellaneous Expense': 'Equity'
+        };
+
+        // Update Accounting Equation
+        function updateAccountingEquation() {
+            let assets = 0;
+            let liabilities = 0;
+            let equity = 0;
+            let details = [];
+
+            // Get all journal entries
+            const numRows = currentTransaction ? currentTransaction.entries.length : 0;
+            
+            for (let i = 0; i < numRows; i++) {
+                const accountName = document.getElementById(`journal-account-${i}`).value.trim();
+                const debitStr = document.getElementById(`journal-debit-${i}`).value;
+                const creditStr = document.getElementById(`journal-credit-${i}`).value;
+                
+                if (!accountName) continue;
+
+                const debitAmount = parseFloat(debitStr.replace(/,/g, '')) || 0;
+                const creditAmount = parseFloat(creditStr.replace(/,/g, '')) || 0;
+
+                // Find account category
+                let category = null;
+                for (const [account, cat] of Object.entries(ACCOUNT_CATEGORIES)) {
+                    if (normalize(account) === normalize(accountName)) {
+                        category = cat;
+                        break;
+                    }
+                }
+
+                if (category) {
+                    if (category === 'Assets') {
+                        // Assets: Debit increases, Credit decreases
+                        const netAmount = debitAmount - creditAmount;
+                        if (netAmount !== 0) {
+                            assets += netAmount;
+                            const sign = netAmount > 0 ? '+' : '';
+                            const formattedAmount = Math.abs(netAmount).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                            details.push(`${accountName} (${sign}$${formattedAmount})`);
+                        }
+                    } else if (category === 'Liabilities') {
+                        // Liabilities: Credit increases, Debit decreases
+                        const netAmount = creditAmount - debitAmount;
+                        if (netAmount !== 0) {
+                            liabilities += netAmount;
+                            const sign = netAmount > 0 ? '+' : '';
+                            const formattedAmount = Math.abs(netAmount).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                            details.push(`${accountName} (${sign}$${formattedAmount})`);
+                        }
+                    } else if (category === 'Equity') {
+                        // For equity accounts, need to check specific account type
+                        // Expenses and Withdrawal decrease equity (opposite of normal equity)
+                        // Revenue and Capital increase equity (normal equity behavior)
+                        let netAmount = 0;
+                        
+                        if (accountName.includes('Expense') || accountName.includes('Withdrawal')) {
+                            // Expenses/Withdrawal: Debit increases the account, which decreases equity
+                            netAmount = creditAmount - debitAmount;
+                        } else {
+                            // Revenue/Capital: Credit increases the account, which increases equity
+                            netAmount = creditAmount - debitAmount;
+                        }
+                        
+                        if (netAmount !== 0) {
+                            equity += netAmount;
+                            const sign = netAmount > 0 ? '+' : '';
+                            const formattedAmount = Math.abs(netAmount).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                            details.push(`${accountName} (${sign}$${formattedAmount})`);
+                        }
+                    }
+                }
+            }
+
+            // Update display
+            const assetsElement = document.getElementById('assets-value');
+            const liabilitiesElement = document.getElementById('liabilities-value');
+            const equityElement = document.getElementById('equity-value');
+            
+            assetsElement.textContent = '$' + assets.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            liabilitiesElement.textContent = '$' + liabilities.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            equityElement.textContent = '$' + equity.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            // Show details if any entries exist
+            const detailElement = document.getElementById('equation-detail');
+            if (details.length > 0) {
+                detailElement.textContent = details.join(' | ');
+            } else {
+                detailElement.textContent = '';
+            }
+
+            // Check if balanced (just for the glow animation)
+            const leftSide = assets;
+            const rightSide = liabilities + equity;
+            
+            if (Math.abs(leftSide - rightSide) < 0.01 && leftSide !== 0) {
+                // Equation is balanced - show glow
+                document.querySelector('.equation-bar').classList.add('equation-balanced');
+                setTimeout(() => {
+                    document.querySelector('.equation-bar').classList.remove('equation-balanced');
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
